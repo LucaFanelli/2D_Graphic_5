@@ -11,6 +11,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
+import android.widget.Toast;
 
 /**
  * A vertex shaded square.
@@ -20,17 +21,32 @@ class Square {
 	private ByteBuffer mColorBuffer;
 	private ByteBuffer mIndexBuffer;
 	private FloatBuffer textureBuffer;
-	private int[] textures = new int[4];
+	private int[] textures = new int[5];
 	private float vertices[];
 	private int bitmap_height;
 	private int bitmap_width;
 
-	private long lastTime = 0;
-	private long frameTime = 100;
+	private Vector2D pos;
+	private Vector2D posTo = new Vector2D(0, 2.0f);
+
+	private long lastTime = System.currentTimeMillis();
+	private long maxFrameTime = 100; // in msec
+	private long frameTime = 0;
 	private int counter_frame = 0;
 
-	public Square(float[] vertices) {
+	private boolean running = false;
+	private float yDir = 1.0f; // direction to the top
+	private float mTransY = 2.0f;
+	private float velocity = 1.0f; // in unit/second
+	private float space = 0.0f;
+
+	private Context context;
+
+	public Square(float[] vertices, float pos_x, float pos_y, Context context) {
+
 		this.vertices = vertices;
+		pos = new Vector2D(pos_x, pos_y);
+		this.context = context;
 
 		float textureVertices[] = { 0.0f, 1.0f, // bottom left (V2)
 				0.0f, 0.0f, // top left (V1)
@@ -62,16 +78,49 @@ class Square {
 
 	public void draw(GL10 gl) {
 
+		// draw frame
 		long now = System.currentTimeMillis();
-		
+
 		// update texture after frame time
-		if(now-lastTime>frameTime) {
-			counter_frame++;
-			lastTime = now;
+		if (frameTime > maxFrameTime) {
+			if (running)
+				counter_frame++;
+			frameTime = 0;
+		} else
+			frameTime += (now - lastTime);
+
+		if (running) {
+			float dy = velocity * (now - lastTime) / 1000;
+
+			space += dy * yDir;
+			pos.add(0, dy * yDir); // multiply by yDir for direction along y
+									// axis
+
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			gl.glLoadIdentity();
+			gl.glTranslatef(0.0f, space, -0.0f);
+			// space += dy;
+
+			if (yDir > 0) {
+				if (pos.y >= posTo.y) {
+					// posTo = pos.cpy();
+					running = false;
+
+				}
+			} else {
+				if (pos.y <= posTo.y) {
+					// posTo = pos.cpy();
+					running = false;
+
+				}
+			}
 		}
 
 		// bind the previously generated texture
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[counter_frame % 4]);
+		if(running)
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[counter_frame % 4]);
+		else
+			gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[4]);
 
 		// Point to our buffers
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
@@ -90,7 +139,9 @@ class Square {
 		// Disable the client state before leaving
 		gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-		
+
+		lastTime = now;
+
 	}
 
 	public void loadGLTexture(GL10 gl, Context context) {
@@ -108,12 +159,15 @@ class Square {
 		Bitmap bitmap4 = BitmapFactory.decodeResource(context.getResources(),
 				R.drawable.mega4);
 
+		Bitmap bitmap5 = BitmapFactory.decodeResource(context.getResources(),
+				R.drawable.mega_stop);
+
 		// // save bitmap dimension in pixel
 		// bitmap_height = bitmap.getHeight();
 		// bitmap_width = bitmap.getWidth();
 
 		// generate one texture pointer
-		gl.glGenTextures(4, textures, 0);
+		gl.glGenTextures(5, textures, 0);
 
 		// ...and bind it to our array
 		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);
@@ -173,9 +227,37 @@ class Square {
 		// our bitmap
 		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap4, 0);
 
+		// five mega stop
+		// texture-----------------------------------------------------------
+		// ...and bind it to our array
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[4]);
+
+		// create nearest filtered texture
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
+				GL10.GL_NEAREST);
+		gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
+				GL10.GL_LINEAR);
+
+		// Use Android GLUtils to specify a two-dimensional texture image from
+		// our bitmap
+		GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap5, 0);
+
 		// Clean up
 		bitmap.recycle();
 
+	}
+
+	public void moveRunning(float xTo, float yTo) {
+		running = true;
+		posTo = new Vector2D(xTo, yTo);
+		if (pos.y > posTo.y)
+			yDir = -1.0f;
+		else
+			yDir = 1.0f;
+
+		Toast.makeText(context,
+				"xTo=" + xTo + " yTo=" + yTo + " pos.y= " + pos.y,
+				Toast.LENGTH_SHORT).show();
 	}
 
 	// private float[] generateTexCoord(float x, float y, float width, float

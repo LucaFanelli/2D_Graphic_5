@@ -6,6 +6,8 @@ import javax.microedition.khronos.opengles.GL10;
 import android.app.Activity;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.lang.Math;
 
@@ -20,16 +22,23 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 	
 	private long lastTime = 0;
 	private long framePerSecond = 1;
+	
+	private int screenWidth;
+	private int screenHeight;
 
 	private float vertices1[] = {
 
-	-1.0f, -1.0f, 0.0f, // V1 - bottom left
+//	-1.0f, -1.0f, 0.0f, // V1 - bottom left
+			4.0f, 4.0f, 0.0f, // V1 - bottom left
 
-			-1.0f, 1.0f, 0.0f, // V2 - top left
+//			-1.0f, 1.0f, 0.0f, // V2 - top left
+			4.0f, 6.0f, 0.0f, // V2 - top left
 
-			1.0f, -1.0f, 0.0f, // V3 - bottom right
+//			1.0f, -1.0f, 0.0f, // V3 - bottom right
+			6.0f, 4.0f, 0.0f, // V3 - bottom right
 
-			1.0f, 1.0f, 0.0f // V4 - top right
+//			1.0f, 1.0f, 0.0f // V4 - top right
+			6.0f, 6.0f, 0.0f // V4 - top right
 	};
 	private float vertices2[] = {
 
@@ -55,7 +64,7 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 	public SquareRenderer(boolean useTranslucentBackground, Context c) {
 		mTranslucentBackground = useTranslucentBackground;
 		context = c;
-		mSquare[0] = new Square(vertices1);
+		mSquare[0] = new Square(vertices1,5.0f,5.0f,context);
 //		mSquare[1] = new Square(vertices2);
 //		mSquare[2] = new Square(vertices3);
 	}
@@ -67,9 +76,9 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 		
 		
-		gl.glMatrixMode(GL10.GL_MODELVIEW);	
-		gl.glLoadIdentity();
-		gl.glTranslatef(0.0f, (float) Math.sin(mTransY), -0.0f);
+//		gl.glMatrixMode(GL10.GL_MODELVIEW);	
+//		gl.glLoadIdentity();
+//		gl.glTranslatef(0.0f, (float) Math.sin(mTransY), -0.0f);
 		
 		mSquare[0].draw(gl);
 		
@@ -91,13 +100,18 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 	}
 
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
+		
+		screenWidth = width;
+		screenHeight = height;
+		
 		gl.glViewport(0, 0, width, height);
 		float ratio = (float) width / height;
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glLoadIdentity();
 		// gl.glFrustumf(-ratio, ratio, -1, 1, 1, 10); // perspective projection
 		// (?)
-		gl.glOrthof(-5, 5, -5, 5, 1, -1);// parallel projection
+//		gl.glOrthof(-5, 5, -5, 5, 1, -1);// parallel projection
+		gl.glOrthof(0, 10, 0, 10, 1, -1);// parallel projection
 	}
 
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -116,5 +130,19 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 		// Really Nice Perspective Calculations
 		gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
 	}
+	
+	public void moveSquare(float touchX, float touchY) {
+		
+		float xTo;
+		float yTo;
+		
+		// conversion from touch coordinates to world coordinates
+		xTo = (touchX/(float)screenWidth)*10.0f; // multiply by frustum width
+		yTo = (1-touchY/(float)screenHeight)*10.0f+1.0f;
+		
+		mSquare[0].moveRunning(xTo,yTo);
+	}
+	
+	
 
 }

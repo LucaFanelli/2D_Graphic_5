@@ -19,6 +19,7 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 	private float mTransAngle;
 	private float mAngle;
 	private Context context;
+	private GLSurfaceView Gview;
 	
 	private long lastTime = 0;
 	private long framePerSecond = 1;
@@ -61,9 +62,12 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 			3.0f, 1.0f, 0.0f // V4 - top right
 	};
 
-	public SquareRenderer(boolean useTranslucentBackground, Context c) {
+	public SquareRenderer(boolean useTranslucentBackground, Context c, GLSurfaceView Gview) {
 		mTranslucentBackground = useTranslucentBackground;
 		context = c;
+		
+		this.Gview = Gview;
+		
 		mSquare[0] = new Square(vertices1,5.0f,5.0f,context);
 //		mSquare[1] = new Square(vertices2);
 //		mSquare[2] = new Square(vertices3);
@@ -138,7 +142,11 @@ class SquareRenderer implements GLSurfaceView.Renderer {
 		
 		// conversion from touch coordinates to world coordinates
 		xTo = (touchX/(float)screenWidth)*10.0f; // multiply by frustum width
-		yTo = (1-touchY/(float)screenHeight)*10.0f+1.0f;
+		yTo = (1-touchY/(float)screenHeight)*10.0f;
+		
+		Toast.makeText(context,
+				"height="+yTo+" width="+xTo,
+				Toast.LENGTH_SHORT).show();
 		
 		mSquare[0].moveRunning(xTo,yTo);
 	}

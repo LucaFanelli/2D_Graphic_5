@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 import android.widget.RemoteViews.ActionException;
@@ -18,10 +19,11 @@ import android.widget.RemoteViews.ActionException;
 public class MainActivity extends Activity {
 
 	private SquareRenderer sr;
+	private GLSurfaceView Gview;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		//super.onCreate(savedInstanceState);
 		// setContentView(R.layout.activity_main);
 
 		// if (savedInstanceState == null) {
@@ -30,10 +32,11 @@ public class MainActivity extends Activity {
 		// .commit();
 		// }
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 				WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		GLSurfaceView Gview = new GLSurfaceView(this);
-		sr = new SquareRenderer(true, getApplicationContext());
+		Gview = new GLSurfaceView(this);
+		sr = new SquareRenderer(true, getApplicationContext(),Gview);
 		Gview.setRenderer(sr);
 		setContentView(Gview);
 	}
@@ -58,22 +61,22 @@ public class MainActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main, container,
-					false);
-			return rootView;
-		}
-	}
+//	/**
+//	 * A placeholder fragment containing a simple view.
+//	 */
+//	public static class PlaceholderFragment extends Fragment {
+//
+//		public PlaceholderFragment() {
+//		}
+//
+//		@Override
+//		public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//				Bundle savedInstanceState) {
+//			View rootView = inflater.inflate(R.layout.fragment_main, container,
+//					false);
+//			return rootView;
+//		}
+//	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {

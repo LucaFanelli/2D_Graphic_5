@@ -37,7 +37,7 @@ class Square {
 	private boolean running = false;
 	private float yDir = 1.0f; // direction to the top
 	private float mTransY = 2.0f;
-	private float velocity = 1.0f; // in unit/second
+	private float velocity = 1.5f; // in unit/second
 	private float space = 0.0f;
 
 	private Context context;
@@ -255,9 +255,9 @@ class Square {
 		else
 			yDir = 1.0f;
 
-		Toast.makeText(context,
-				"xTo=" + xTo + " yTo=" + yTo + " pos.y= " + pos.y,
-				Toast.LENGTH_SHORT).show();
+//		Toast.makeText(context,
+//				"xTo=" + xTo + " yTo=" + yTo + " pos.y= " + pos.y,
+//				Toast.LENGTH_SHORT).show();
 	}
 
 	// private float[] generateTexCoord(float x, float y, float width, float

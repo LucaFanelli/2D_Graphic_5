@@ -3,15 +3,11 @@ package com.example.square;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-
 import javax.microedition.khronos.opengles.GL10;
-import javax.microedition.khronos.opengles.GL11;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
-import android.widget.Toast;
 
 /**
  * A vertex shaded square.
@@ -23,8 +19,6 @@ class Square {
 	private FloatBuffer textureBuffer;
 	private int[] textures = new int[5];
 	private float vertices[];
-	private int bitmap_height;
-	private int bitmap_width;
 
 	private Vector2D pos;
 	private Vector2D posTo = new Vector2D(0, 2.0f);
@@ -36,17 +30,14 @@ class Square {
 
 	private boolean running = false;
 	private float yDir = 1.0f; // direction to the top
-	private float mTransY = 2.0f;
 	private float velocity = 1.5f; // in unit/second
 	private float space = 0.0f;
 
-	private Context context;
 
-	public Square(float[] vertices, float pos_x, float pos_y, Context context) {
+	public Square(float[] vertices, float pos_x, float pos_y) {
 
 		this.vertices = vertices;
 		pos = new Vector2D(pos_x, pos_y);
-		this.context = context;
 
 		float textureVertices[] = { 0.0f, 1.0f, // bottom left (V2)
 				0.0f, 0.0f, // top left (V1)
@@ -99,17 +90,14 @@ class Square {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glTranslatef(0.0f, space, -0.0f);
-			// space += dy;
 
 			if (yDir > 0) {
 				if (pos.y >= posTo.y) {
-					// posTo = pos.cpy();
 					running = false;
 
 				}
 			} else {
 				if (pos.y <= posTo.y) {
-					// posTo = pos.cpy();
 					running = false;
 
 				}
@@ -254,36 +242,6 @@ class Square {
 			yDir = -1.0f;
 		else
 			yDir = 1.0f;
-
-//		Toast.makeText(context,
-//				"xTo=" + xTo + " yTo=" + yTo + " pos.y= " + pos.y,
-//				Toast.LENGTH_SHORT).show();
 	}
-
-	// private float[] generateTexCoord(float x, float y, float width, float
-	// height) {
-	//
-	// float[] ret = new float[4 * 2];
-	// ret[0] = x / bitmap_width; // top left corner
-	// ret[1] = y / bitmap_height;
-	//
-	// ret[2] = x / bitmap_width; // bottom left corner
-	// ret[3] = ret[1] + height / bitmap_height;
-	//
-	// ret[4] = ret[0] + width / bitmap_width; // top right corner
-	// ret[5] = y / bitmap_height;
-	//
-	// ret[6] = ret[0] + width / bitmap_width; // bottom right corner
-	// ret[7] = ret[1] + height / bitmap_height;
-	//
-	// return ret;
-	// }
-	//
-	// private int getKeyFrameNumber(float stateTime) {
-	//
-	// float frame_duration = 1000.0f;
-	// int ret = (int) (stateTime/frame_duration);
-	// return ret%2;
-	// }
 
 }
